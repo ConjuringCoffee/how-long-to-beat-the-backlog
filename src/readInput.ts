@@ -1,5 +1,6 @@
 import { promises as fs } from 'fs';
 import path from 'path';
+import { parse } from 'csv-parse/sync';
 
 export interface Game {
     uniqueGameId: number;
@@ -13,61 +14,15 @@ export interface Game {
     childOf: number | null;
 }
 
-function parseFile(text: string): string[][] {
-    // normalize newlines
-    text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-
-    const rows: string[][] = [];
-    let field = '';
-    let row: string[] = [];
-    let inQuotes = false;
-
-    for (let i = 0; i < text.length; i++) {
-        const ch = text[i];
-
-        if (ch === '"') {
-            // handle escaped quotes ""
-            if (inQuotes && text[i + 1] === '"') {
-                field += '"';
-                i++;
-            } else {
-                inQuotes = !inQuotes;
-            }
-            continue;
-        }
-
-        if (ch === ',' && !inQuotes) {
-            row.push(field);
-            field = '';
-            continue;
-        }
-
-        if (ch === '\n' && !inQuotes) {
-            row.push(field);
-            rows.push(row);
-            row = [];
-            field = '';
-            continue;
-        }
-
-        field += ch;
-    }
-
-    // push any trailing data (in case file doesn't end with newline)
-    if (inQuotes === false && (field !== '' || row.length > 0)) {
-        row.push(field);
-        rows.push(row);
-    }
-
-    return rows;
-}
-
 export async function readGamesFromInputFile(): Promise<Game[]> {
-    const headerLineIndex = 2;
+    const headerLineIndex = 1;
 
     const filePath = path.resolve(__dirname, '..', 'input', 'input.csv');
     const rawFile = await fs.readFile(filePath, 'utf8');
-    const rows = parseFile(rawFile);
+    const rows = parse(rawFile, {
+        skip_empty_lines: true,
+        relax_column_count: true,
+    }) as string[][];
 
     if (rows.length <= headerLineIndex) {
         return [];
