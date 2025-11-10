@@ -1,10 +1,10 @@
 # how-long-to-beat-the-backlog
-Small tool that reads ab Backloggery library export CSV, looks up times on HowLongToBeat and writes the result to a new CSV. This is an MVP, so don't expect this to be too polished.
+Small tool that reads a Backloggery library export CSV, looks up times on HowLongToBeat and writes the result to a new CSV. This is an MVP, so don't expect this to be too polished.
 
 # How to use
 1. Clone the repository
 2. `npm install`
-3. Place a Backloggery library export named `input.csv` into the folder `input`.
+3. Place a Backloggery library export named `input.csv` into the folder `input`. (Go to "Settings", then "Data" on the Backloggery to access the export.)
 4. `npm run`
 
 The results are written to `output.csv` in the folder `output`.
