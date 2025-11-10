@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import { parse } from 'csv-parse/sync';
-import { EvaluationResult } from './hltbevaluate';
+import { EvaluationResult } from './evaluate';
 
 export interface Game {
     uniqueGameId: number;

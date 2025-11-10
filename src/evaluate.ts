@@ -1,4 +1,4 @@
-import { HowLongToBeatEntry, HowLongToBeatService } from "./howlongtobeat";
+import { HowLongToBeatEntry, HowLongToBeatService } from "./howlongtobeat/howlongtobeat";
 
 export interface EvaluationResult {
     backloggeryName: string;

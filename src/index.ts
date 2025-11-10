@@ -1,4 +1,4 @@
-import { evaluateResults, EvaluationResult } from "./hltbevaluate";
+import { evaluateResults, EvaluationResult } from "./evaluate";
 import { readGamesFromInputFile, writeResultsToCSV as writeResultsToOutputFile } from "./io";
 
 async function main() {
