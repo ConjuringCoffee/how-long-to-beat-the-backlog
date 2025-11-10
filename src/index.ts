@@ -1,9 +1,8 @@
-import { HowLongToBeatService } from "./howlongtobeat";
-import { readGamesFromInputFile } from "./readInput";
+import { evaluateResults, EvaluationResult } from "./hltbevaluate";
+import { readGamesFromInputFile, writeResultsToCSV as writeResultsToOutputFile } from "./io";
 
 async function main() {
     const games = await readGamesFromInputFile();
-    console.log(`Loaded ${games.length} games`);
     
     const unfinishedGames = games.filter(game => 
         game.priority !== 'Shelved' 
@@ -11,8 +10,16 @@ async function main() {
             || game.status === 'Unfinished' ) 
     );
 
-    const hltbService = new HowLongToBeatService();
-    hltbService.search(unfinishedGames[0].title).then(result => console.log(result));
+    const evaluationResults: EvaluationResult[] = [];
+
+    await Promise.all( unfinishedGames.map(async (game) => {
+        const result = await evaluateResults(game);
+        evaluationResults.push(result);
+    }));
+
+    await writeResultsToOutputFile(evaluationResults);
+
+    console.log('Done');
 };
 
 main();

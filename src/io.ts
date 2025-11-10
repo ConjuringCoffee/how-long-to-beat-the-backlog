@@ -1,6 +1,7 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import { parse } from 'csv-parse/sync';
+import { EvaluationResult } from './hltbevaluate';
 
 export interface Game {
     uniqueGameId: number;
@@ -15,8 +16,8 @@ export interface Game {
 }
 
 export async function readGamesFromInputFile(): Promise<Game[]> {
-    const filePath = path.resolve(__dirname, '..', 'input', 'input.csv');
-    const rawFile = await fs.readFile(filePath, 'utf8');
+    //const filePath = path.resolve(__dirname, '..', 'input', 'input.csv');
+    const rawFile = await fs.readFile('input/input.csv', 'utf8');
     
     const rows = parse(rawFile, {
         from_line: 3,
@@ -35,4 +36,14 @@ export async function readGamesFromInputFile(): Promise<Game[]> {
         ownership: row['Ownership']?.trim() || '',
         childOf: row['Child Of'] ? Number(row['Child Of']) || null : null,
     }));
+}
+
+export async function writeResultsToCSV(evaluationResults: EvaluationResult[]): Promise<void> {
+    const header = 'Backloggery Name,HowLongToBeat Name,Similarity,Gameplay Main,Gameplay Main + Extra,Gameplay Completionist\n';
+    const csvContent = evaluationResults.map((result) => 
+        `"${result.backloggeryName}","${result.howLongToBeatName}",${result.similarity},${result.gameplayMain},${result.gameplayMainExtra},${result.gameplayCompletionist}`
+    ).join('\n');
+
+    await fs.mkdir('output', { recursive: true });
+    await fs.writeFile('output/output.csv', header + csvContent);
 }

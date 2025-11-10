@@ -87,7 +87,6 @@ export class HowLongToBeatEntry {
     public readonly id: string,
     public readonly name: string,
     public readonly description: string,
-    /* replaces playableOn */
     public readonly platforms: string[],
     public readonly imageUrl: string,
     public readonly timeLabels: Array<string[]>,
