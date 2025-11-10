@@ -15,54 +15,24 @@ export interface Game {
 }
 
 export async function readGamesFromInputFile(): Promise<Game[]> {
-    const headerLineIndex = 1;
-
     const filePath = path.resolve(__dirname, '..', 'input', 'input.csv');
     const rawFile = await fs.readFile(filePath, 'utf8');
+    
     const rows = parse(rawFile, {
-        skip_empty_lines: true,
+        from_line: 3,
+        columns: true,
         relax_column_count: true,
-    }) as string[][];
+    }) as Record<string, string>[];
 
-    if (rows.length <= headerLineIndex) {
-        return [];
-    }
-
-    const headers = rows[headerLineIndex].map(h => h.trim().replace(/^"|"$/g, ''));
-
-    const getGameFromRow = (cells: string[]): Game => {
-        const get = (name: string) => {
-            const idx = headers.indexOf(name);
-            return idx >= 0 ? (cells[idx] ?? '').trim() : '';
-        };
-
-        const uidRaw = get('Unique Game ID');
-        const childOfRaw = get('Child Of');
-
-        return {
-            uniqueGameId: uidRaw === '' ? NaN : Number(uidRaw),
-            title: get('Title'),
-            platform: get('Platform'),
-            subPlatform: get('Sub-Platform') || null,
-            status: get('Status'),
-            priority: get('Priority'),
-            format: get('Format'),
-            ownership: get('Ownership'),
-            childOf: (() => {
-                if (childOfRaw === '') { 
-                    return null;
-                }
-                const childId = Number(childOfRaw);
-                return childId || null;
-            })(),
-        };
-    };
-
-    const result: Game[] = [];
-
-    for (let i = headerLineIndex + 1; i < rows.length; i++) {
-        result.push(getGameFromRow(rows[i]));
-    }
-
-    return result;
+    return rows.map(row => ({
+        uniqueGameId: row['Unique Game ID'] === '' ? NaN : Number(row['Unique Game ID']),
+        title: row['Title']?.trim() || '',
+        platform: row['Platform']?.trim() || '',
+        subPlatform: row['Sub-Platform']?.trim() || null,
+        status: row['Status']?.trim() || '',
+        priority: row['Priority']?.trim() || '',
+        format: row['Format']?.trim() || '',
+        ownership: row['Ownership']?.trim() || '',
+        childOf: row['Child Of'] ? Number(row['Child Of']) || null : null,
+    }));
 }
