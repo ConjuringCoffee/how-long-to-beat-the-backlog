@@ -1,3 +1,4 @@
+import { HowLongToBeatService } from "./howlongtobeat";
 import { readGamesFromInputFile } from "./readInput";
 
 async function main() {
@@ -9,6 +10,9 @@ async function main() {
         && ( game.status === 'Unplayed' 
             || game.status === 'Unfinished' ) 
     );
+
+    const hltbService = new HowLongToBeatService();
+    hltbService.search(unfinishedGames[0].title).then(result => console.log(result));
 };
 
 main();

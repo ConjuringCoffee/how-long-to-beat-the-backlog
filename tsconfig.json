@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "module": "commonjs",
+        "esModuleInterop": true, // Needed to support copied HowLongToBeat API
+        "allowSyntheticDefaultImports": true,
+        "outDir": "dist",
+        "sourceMap": true,
+        "declaration": true
+    },
+    "exclude": [
+        "node_modules"
+    ]
+}
