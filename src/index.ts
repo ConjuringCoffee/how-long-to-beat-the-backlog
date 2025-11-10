@@ -9,8 +9,6 @@ async function main() {
         && ( game.status === 'Unplayed' 
             || game.status === 'Unfinished' ) 
     );
-
-    console.log(`You have ${unfinishedGames.length} unfinished games in your backlog.`);
 };
 
 main();
