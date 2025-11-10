@@ -1,5 +1,5 @@
 node_modules
 input/*
-!input/
+!input/.gitkeep
 output/*
-!output/
+!output/.gitkeep
