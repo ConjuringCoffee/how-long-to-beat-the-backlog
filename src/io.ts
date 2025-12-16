@@ -39,9 +39,9 @@ export async function readGamesFromInputFile(): Promise<Game[]> {
 }
 
 export async function writeResultsToCSV(evaluationResults: EvaluationResult[]): Promise<void> {
-    const header = 'Backloggery Name,HowLongToBeat Name,Similarity,Gameplay Main,Gameplay Main + Extra,Gameplay Completionist\n';
+    const header = 'Backloggery Name,HowLongToBeat Name,Backloggery Platform, Backloggery Sub-Platform, Backloggery Status, Backloggery Priority, Backloggery Ownership, Similarity,Gameplay Main,Gameplay Main + Extra,Gameplay Completionist\n';
     const csvContent = evaluationResults.map((result) => 
-        `"${result.backloggeryName}","${result.howLongToBeatName}",${result.similarity},${result.gameplayMain},${result.gameplayMainExtra},${result.gameplayCompletionist}`
+        `"${result.backloggeryName}","${result.howLongToBeatName}","${result.backloggeryPlatform}","${result.backloggerySubPlatform}","${result.backloggeryStatus}","${result.backloggeryPriority}","${result.backloggeryOwnership}","${result.similarity}","${result.gameplayMain}","${result.gameplayMainExtra}","${result.gameplayCompletionist}"`
     ).join('\n');
 
     await fs.mkdir('output', { recursive: true });
