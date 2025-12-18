@@ -19,9 +19,6 @@ export class HltbSearch {
 
   private searchToken: string;
 
-  private static readonly SEARCH_KEY_PATTERN =
-    /"\/api\/locate\/".concat\("([a-zA-Z0-9]+)"\).concat\("([a-zA-Z0-9]+)"\)/g;
-
   payload: any = {
     "searchType": "games",
     "searchTerms": [""],
