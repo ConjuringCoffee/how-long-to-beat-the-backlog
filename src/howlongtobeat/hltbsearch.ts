@@ -14,10 +14,10 @@ const cheerio: any = require('cheerio')
 export class HltbSearch {
   public static BASE_URL: string = 'https://howlongtobeat.com/';
   public static DETAIL_URL: string = `${HltbSearch.BASE_URL}game?id=`;
-  public static SEARCH_URL: string = `${HltbSearch.BASE_URL}api/locate/`;
+  public static SEARCH_URL: string = `${HltbSearch.BASE_URL}api/search/`;
   public static IMAGE_URL: string = `${HltbSearch.BASE_URL}games/`;
 
-  private searchKey: string;
+  private searchToken: string;
 
   private static readonly SEARCH_KEY_PATTERN =
     /"\/api\/locate\/".concat\("([a-zA-Z0-9]+)"\).concat\("([a-zA-Z0-9]+)"\)/g;
@@ -91,19 +91,20 @@ export class HltbSearch {
     let search = { ...this.payload };
     search.searchTerms = query;
     try {
-      if (!this.searchKey) {
-        this.searchKey = await this.getSearchKey();
+      if (!this.searchToken) {
+        this.searchToken = await this.getSearchToken();
       }
 
-      const searchUrlWithKey = HltbSearch.SEARCH_URL + this.searchKey;
+      const searchUrl = HltbSearch.SEARCH_URL;
 
-      let result = await axios.post(searchUrlWithKey, search, {
+      let result = await axios.post(searchUrl, search, {
         headers: {
           "User-Agent": new UserAgent().toString(),
           'Accept': '*/*',
           "Content-Type": "application/json",
           "Origin": "https://howlongtobeat.com",
           "Referer": `https://howlongtobeat.com/`,
+          "x-auth-token": this.searchToken,
         },
         timeout: 20000,
         signal,
@@ -121,54 +122,26 @@ export class HltbSearch {
     }
   }
 
-  private async getSearchKey(): Promise<string> {
-    const res = await axios.get(HltbSearch.BASE_URL, {
-      headers: {
-        "User-Agent": new UserAgent().toString(),
-        origin: "https://howlongtobeat.com",
-        referer: "https://howlongtobeat.com",
-      },
-    });
-    const html = res.data;
-    const $ = cheerio.load(html);
+  private async getSearchToken(): Promise<string> {
+    try {
+        const response = await axios.get(`${HltbSearch.SEARCH_URL}init?t=${Date.now()}`, {
+        headers: {
+          "User-Agent": new UserAgent().toString(),
+          "Origin": "https://howlongtobeat.com",
+          "Referer": "https://howlongtobeat.com",
+        },
+        timeout: 20000,
+      });
 
-    const scripts = $("script[src]");
-
-
-    for (const el of scripts) {
-      const src = $(el).attr("src") as string;
-
-      if (!src.includes("_app-")) {
-        continue;
+      if (response && response.data && typeof response.data.token === "string") {
+        return response.data.token;
       }
 
-      const scriptUrl = HltbSearch.BASE_URL + src;
-
-      try {
-        const res = await axios.get(scriptUrl, {
-          headers: {
-            "User-Agent": new UserAgent().toString(),
-            origin: "https://howlongtobeat.com",
-            referer: "https://howlongtobeat.com",
-          },
-        });
-
-        const scriptText = res.data;
-        const matches = [...scriptText.matchAll(HltbSearch.SEARCH_KEY_PATTERN)];
-        if (matches.length === 0) {
-          // Save the script text to a file for inspection
-          fs.writeFileSync("hltb_app_script.js", scriptText, "utf-8");
-          console.log("Script text saved to hltb_app_script.js");
-          continue;
-        }
-        const firstKey: string = matches[0][1]
-        const secondKey: string = matches[0][2]
-        return firstKey.concat(secondKey)
-      } catch (error) {
-        continue;
+      throw new Error("Unexpected init response: missing token");
+    } catch (error) {
+      if (error && (error as any).response) {
+        throw new Error(`Failed to get search key (status=${(error as any).response.status})`);
       }
+      throw new Error(error as any);
     }
-
-    throw new Error("Could not find search key");
-  }
-}
+  } }
